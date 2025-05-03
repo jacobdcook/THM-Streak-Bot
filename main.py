@@ -4,9 +4,9 @@ import datetime
 from login import *
 from keepstreak import *
 from selenium import webdriver
-from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 
+print("UPDATED VERSION - USING DIRECT FIREFOX INITIALIZATION")
 
 def main():
     # Configure Firefox options for GitHub Actions environment
