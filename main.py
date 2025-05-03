@@ -9,7 +9,7 @@ from webdriver_manager.firefox import GeckoDriverManager
 
 
 def main():
-    # Configure Firefox options for headless operation in GitHub Actions
+    # Configure Firefox options for GitHub Actions environment
     firefox_options = webdriver.FirefoxOptions()
     firefox_options.headless = True
     firefox_options.add_argument("--no-sandbox")
@@ -17,10 +17,10 @@ def main():
     firefox_options.set_preference("media.volume_scale", "0.0")
     firefox_options.set_preference("dom.push.enabled", False)
     
-    # Set MOZ_HEADLESS environment variable
+    # Set MOZ_HEADLESS environment variable for GitHub Actions
     os.environ['MOZ_HEADLESS'] = '1'
     
-    # Configure and initialize the WebDriver with appropriate logging
+    # Configure the WebDriver
     driver = webdriver.Firefox(
         service=Service(
             GeckoDriverManager(path=os.getcwd()).install(), 
@@ -33,7 +33,7 @@ def main():
     driver.implicitly_wait(10)
     
     # Clear terminal output
-    os.system("clear")
+    os.system("cls" if sys.platform == "win32" else "clear")
 
     # Initialize log file
     with open("tryhackmebot.log", 'a') as f:
