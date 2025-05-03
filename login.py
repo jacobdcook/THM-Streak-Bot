@@ -31,8 +31,11 @@ def recapcha(driver):
 
     try:
         # Find and switch to the reCAPTCHA iframe
-        frames = driver.find_element(By.TAG_NAME, "iframe")
-        driver.switch_to.frame(frames)
+        frames = driver.find_elements(By.TAG_NAME, "iframe")
+        for frame in frames:
+            if "recaptcha" in frame.get_attribute("src").lower():
+                driver.switch_to.frame(frame)
+                break
         
         time.sleep(random.uniform(1,3))
         driver.find_element(By.CLASS_NAME, "recaptcha-checkbox-border").click()
@@ -42,8 +45,11 @@ def recapcha(driver):
         
         # Switch to the audio challenge
         try:
-            frames = driver.find_element(By.XPATH, "//iframe[@title='recaptcha challenge expires in two minutes']")
-            driver.switch_to.frame(frames)
+            frames = driver.find_elements(By.TAG_NAME, "iframe")
+            for frame in frames:
+                if "recaptcha" in frame.get_attribute("src").lower() and "challenge" in frame.get_attribute("src").lower():
+                    driver.switch_to.frame(frame)
+                    break
             
             # Click the audio button
             audio_button = WebDriverWait(driver, 10).until(
@@ -103,49 +109,128 @@ def login_form(driver):
     config = configparser.ConfigParser()
     config.read("account.conf")
     try:
+        # Take a screenshot before interacting with the page
         driver.get("https://tryhackme.com/login")
-        time.sleep(random.uniform(3,6))
+        time.sleep(5)  # Give page time to fully load
         
-        # Enhanced error handling for finding elements
         try:
-            email_field = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "form-control"))
-            )
-            email_field.send_keys(config["account"]["mail"])
-            
-            time.sleep(random.uniform(1,3))
-            
-            password_field = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, "//input[@type='password']"))
-            )
-            password_field.send_keys(config["account"]["pass"])
-            
-            # Handle reCAPTCHA
-            recapcha(driver)
-            
-            time.sleep(random.uniform(1,3))
-            
-            login_button = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Sign In')]"))
-            )
-            login_button.click()
-            
-        except (NoSuchElementException, TimeoutException) as e:
+            driver.save_screenshot("login_page.png")
             with open("tryhackmebot.log", 'a') as f:
-                print(f"[!] Error finding login elements: {e}")
-                f.write(f"[!] Error finding login elements: {e}\n")
-            raise Exception("Login form elements not found")
-
-        # Verify successful login
-        time.sleep(5)  # Wait for login to complete
-        if "dashboard" in driver.current_url:
+                print("[+] Saved screenshot of login page")
+                f.write("[+] Saved screenshot of login page\n")
+        except Exception as e:
+            with open("tryhackmebot.log", 'a') as f:
+                print(f"[!] Failed to save screenshot: {e}")
+                f.write(f"[!] Failed to save screenshot: {e}\n")
+        
+        # Debug - Print page source
+        with open("tryhackmebot.log", 'a') as f:
+            print(f"[+] Page title: {driver.title}")
+            f.write(f"[+] Page title: {driver.title}\n")
+        
+        # Enhanced error handling for finding elements with multiple selectors
+        # Try different selectors for email field
+        email_selectors = [
+            (By.ID, "email"),
+            (By.NAME, "email"),
+            (By.XPATH, "//input[@type='email']"),
+            (By.XPATH, "//input[contains(@placeholder, 'email')]"),
+            (By.XPATH, "//input[contains(@class, 'form-control')]")
+        ]
+        
+        email_field = None
+        for selector_type, selector_value in email_selectors:
+            try:
+                email_field = WebDriverWait(driver, 5).until(
+                    EC.presence_of_element_located((selector_type, selector_value))
+                )
+                with open("tryhackmebot.log", 'a') as f:
+                    print(f"[+] Found email field with selector: {selector_type}={selector_value}")
+                    f.write(f"[+] Found email field with selector: {selector_type}={selector_value}\n")
+                break
+            except:
+                continue
+        
+        if not email_field:
+            raise Exception("Email field not found with any selector")
+        
+        email_field.clear()
+        email_field.send_keys(config["account"]["mail"])
+        time.sleep(random.uniform(1,2))
+        
+        # Try different selectors for password field
+        password_selectors = [
+            (By.ID, "password"),
+            (By.NAME, "password"),
+            (By.XPATH, "//input[@type='password']"),
+            (By.XPATH, "//input[contains(@placeholder, 'password')]")
+        ]
+        
+        password_field = None
+        for selector_type, selector_value in password_selectors:
+            try:
+                password_field = WebDriverWait(driver, 5).until(
+                    EC.presence_of_element_located((selector_type, selector_value))
+                )
+                with open("tryhackmebot.log", 'a') as f:
+                    print(f"[+] Found password field with selector: {selector_type}={selector_value}")
+                    f.write(f"[+] Found password field with selector: {selector_type}={selector_value}\n")
+                break
+            except:
+                continue
+        
+        if not password_field:
+            raise Exception("Password field not found with any selector")
+        
+        password_field.clear()
+        password_field.send_keys(config["account"]["pass"])
+        
+        # Handle reCAPTCHA
+        recapcha(driver)
+        
+        time.sleep(random.uniform(1,2))
+        
+        # Try different selectors for login button
+        button_selectors = [
+            (By.XPATH, "//button[contains(text(), 'Sign In')]"),
+            (By.XPATH, "//button[contains(text(), 'Login')]"),
+            (By.XPATH, "//button[@type='submit']"),
+            (By.XPATH, "//input[@type='submit']"),
+            (By.XPATH, "//button[contains(@class, 'btn')]")
+        ]
+        
+        login_button = None
+        for selector_type, selector_value in button_selectors:
+            try:
+                login_button = WebDriverWait(driver, 5).until(
+                    EC.element_to_be_clickable((selector_type, selector_value))
+                )
+                with open("tryhackmebot.log", 'a') as f:
+                    print(f"[+] Found login button with selector: {selector_type}={selector_value}")
+                    f.write(f"[+] Found login button with selector: {selector_type}={selector_value}\n")
+                break
+            except:
+                continue
+        
+        if not login_button:
+            raise Exception("Login button not found with any selector")
+        
+        login_button.click()
+        
+        # Verify successful login with longer wait time
+        time.sleep(10)  # Increased wait time for login
+        with open("tryhackmebot.log", 'a') as f:
+            print(f"[+] Current URL after login attempt: {driver.current_url}")
+            f.write(f"[+] Current URL after login attempt: {driver.current_url}\n")
+            
+        if "dashboard" in driver.current_url or "profile" in driver.current_url:
             with open("tryhackmebot.log", 'a') as f:
                 print("[+] You Are Logged In!")
                 f.write("[+] You Are Logged In!\n")
         else:
             with open("tryhackmebot.log", 'a') as f:
-                print("[!] Login failed, retrying...")
-                f.write("[!] Login failed, retrying...\n")
+                print("[!] Login failed, current URL doesn't indicate success")
+                f.write("[!] Login failed, current URL doesn't indicate success\n")
             login_form(driver)
             
     except KeyboardInterrupt:
