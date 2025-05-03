@@ -21,14 +21,13 @@ def main():
     os.environ['MOZ_HEADLESS'] = '1'
     
     # Configure the WebDriver
-    driver = webdriver.Firefox(
-        service=Service(
-            GeckoDriverManager(path=os.getcwd()).install(), 
-            log_path=os.path.join(os.getcwd(), 'geckodriver.log')
-        ), 
-        options=firefox_options
-    )
-    
+driver = webdriver.Firefox(
+    service=Service(
+        GeckoDriverManager().install(), 
+        log_path=os.path.join(os.getcwd(), 'geckodriver.log')
+    ), 
+    options=firefox_options
+)
     # Set implicit wait time
     driver.implicitly_wait(10)
     
