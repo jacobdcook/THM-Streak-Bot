@@ -1,10 +1,4 @@
-# THM-Bot-Githubactions
-THM Bot to maintain your try hack me streaks
 # TryHackMe Streak Bot
-
-[![GitHub Actions](https://img.shields.io/github/workflow/status/yourusername/thm-streak-bot/TryHackMe%20Streak%20Bot?style=flat-square)](https://github.com/yourusername/thm-streak-bot/actions)
-[![Python 3.10](https://img.shields.io/badge/python-3.10-yellow.svg?style=flat-square)](https://www.python.org/)
-[![License](https://img.shields.io/github/license/yourusername/thm-streak-bot?style=flat-square)](LICENSE)
 
 An automated bot that maintains your TryHackMe streak using GitHub Actions. Set it up once and never worry about losing your streak again!
 
