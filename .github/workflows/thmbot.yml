@@ -1,0 +1,49 @@
+name: TryHackMe Streak Bot
+
+on:
+  schedule:
+    # Run daily at a specific time (UTC)
+    - cron: '30 12 * * *'  # This will run at 12:30 UTC every day
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  maintain-streak:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Firefox
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y firefox
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get install -y ffmpeg
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Create account configuration
+        run: |
+          echo "[account]" > account.conf
+          echo "mail = ${{ secrets.THM_EMAIL }}" >> account.conf
+          echo "pass = ${{ secrets.THM_PASSWORD }}" >> account.conf
+
+      - name: Run THM Bot
+        run: python main.py
+
+      - name: Upload log as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: thm-bot-logs
+          path: tryhackmebot.log
+          retention-days: 7
