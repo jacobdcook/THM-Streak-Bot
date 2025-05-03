@@ -21,7 +21,7 @@ jobs:
       - name: Install Firefox
         run: |
           sudo apt-get update
-          sudo apt-get install -y firefox xvfb
+          sudo apt-get install -y firefox firefox-geckodriver xvfb
 
       - name: Install FFmpeg
         run: |
@@ -50,14 +50,19 @@ jobs:
           Xvfb :99 &
           export DISPLAY=:99
 
-      - name: Run THM Bot
-        run: python main.py
+      - name: Run THM Bot with timeout
+        run: |
+          timeout 5m python main.py
+        env:
+          DISPLAY: :99
+        continue-on-error: true
 
-      - name: Upload log as artifact
+      - name: Upload log and screenshots as artifact
         uses: actions/upload-artifact@master
         with:
           name: thm-bot-logs
           path: |
             tryhackmebot.log
             geckodriver.log
+            *.png
           retention-days: 7
