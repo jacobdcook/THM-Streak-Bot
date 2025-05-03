@@ -11,6 +11,18 @@ An automated bot that maintains your TryHackMe streak using GitHub Actions. Set 
 - **Detailed Logs**: Every action is logged and stored as GitHub artifacts
 - **Customizable Schedule**: Set your preferred time for the daily check-in
 
+## ⚠️ Important Requirements
+
+Before using this bot, you **MUST** join the [polkit room on TryHackMe](https://tryhackme.com/room/polkit). The bot specifically interacts with this room to maintain your streak.
+
+The bot works by:
+1. Logging into your TryHackMe account
+2. Navigating to the polkit room
+3. Resetting progress and completing an action to maintain your streak
+4. Verifying the streak counter has increased
+
+If you haven't joined this room, the bot will not function correctly.
+
 ## 🛠️ Setup
 
 ### 1. Fork this repository
@@ -58,7 +70,7 @@ You can manually trigger the workflow at any time:
 The bot uses Selenium with Firefox in headless mode to:
 1. Log in to your TryHackMe account
 2. Solve any CAPTCHA challenges using audio recognition
-3. Navigate to a specific room
+3. Navigate to the polkit room
 4. Reset progress and complete an action to maintain your streak
 5. Verify the streak counter has increased
 6. Log all actions for review
@@ -68,6 +80,7 @@ The bot uses Selenium with Firefox in headless mode to:
 - **Failed Runs**: Check the workflow logs for specific error messages
 - **CAPTCHA Issues**: If Google's reCAPTCHA patterns have changed, an update might be needed
 - **IP Blocking**: If you notice unusual failures, TryHackMe might be rate-limiting the GitHub Actions IP ranges
+- **Room Access**: Ensure you have joined the polkit room on your TryHackMe account
 
 ## ⚠️ Disclaimer
 
