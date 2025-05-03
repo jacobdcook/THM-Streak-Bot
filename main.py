@@ -20,14 +20,23 @@ def main():
     # Set MOZ_HEADLESS environment variable for GitHub Actions
     os.environ['MOZ_HEADLESS'] = '1'
     
-    # Configure the WebDriver
-driver = webdriver.Firefox(
-    service=Service(
-        GeckoDriverManager().install(), 
-        log_path=os.path.join(os.getcwd(), 'geckodriver.log')
-    ), 
-    options=firefox_options
-)
+    try:
+        # Configure the WebDriver with error handling
+        driver = webdriver.Firefox(
+            service=Service(
+                GeckoDriverManager().install(), 
+                log_path=os.path.join(os.getcwd(), 'geckodriver.log')
+            ), 
+            options=firefox_options
+        )
+    except Exception as e:
+        print(f"Error initializing webdriver with GeckoDriverManager: {e}")
+        print("Attempting alternative Firefox initialization...")
+        # Alternative approach without GeckoDriverManager
+        driver = webdriver.Firefox(
+            options=firefox_options
+        )
+    
     # Set implicit wait time
     driver.implicitly_wait(10)
     
