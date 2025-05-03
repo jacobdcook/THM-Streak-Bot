@@ -1,3 +1,4 @@
+print("UPDATED VERSION - RUNNING NEW CODE WITHOUT GECKODRIVER MANAGER PATH")
 import os
 import sys
 import datetime
