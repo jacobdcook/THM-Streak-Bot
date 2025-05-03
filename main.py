@@ -21,21 +21,13 @@ def main():
     os.environ['MOZ_HEADLESS'] = '1'
     
     try:
-        # Configure the WebDriver with error handling
+        # Configure the WebDriver - IMPORTANT: No path parameter here
         driver = webdriver.Firefox(
-            service=Service(
-                GeckoDriverManager().install(), 
-                log_path=os.path.join(os.getcwd(), 'geckodriver.log')
-            ), 
             options=firefox_options
         )
     except Exception as e:
-        print(f"Error initializing webdriver with GeckoDriverManager: {e}")
-        print("Attempting alternative Firefox initialization...")
-        # Alternative approach without GeckoDriverManager
-        driver = webdriver.Firefox(
-            options=firefox_options
-        )
+        print(f"Error initializing Firefox webdriver: {e}")
+        sys.exit(1)
     
     # Set implicit wait time
     driver.implicitly_wait(10)
