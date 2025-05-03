@@ -2,8 +2,8 @@ name: TryHackMe Streak Bot
 
 on:
   schedule:
-    # Run daily at a specific time (UTC)
-    - cron: '0 17 * * *'  # This will run at 12:30 UTC every day
+    # Run daily at 10:30 PM IST (17:00 UTC)
+    - cron: '0 17 * * *'
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -21,16 +21,23 @@ jobs:
       - name: Install Firefox
         run: |
           sudo apt-get update
-          sudo apt-get install -y firefox
+          sudo apt-get install -y firefox xvfb
 
       - name: Install FFmpeg
         run: |
           sudo apt-get install -y ffmpeg
 
+      - name: Verify dependency versions
+        run: |
+          firefox --version
+          python --version
+          pip --version
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip show webdriver-manager selenium pydub SpeechRecognition
 
       - name: Create account configuration
         run: |
@@ -38,12 +45,19 @@ jobs:
           echo "mail = ${{ secrets.THM_EMAIL }}" >> account.conf
           echo "pass = ${{ secrets.THM_PASSWORD }}" >> account.conf
 
+      - name: Setup virtual display
+        run: |
+          Xvfb :99 &
+          export DISPLAY=:99
+
       - name: Run THM Bot
         run: python main.py
 
       - name: Upload log as artifact
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v2
         with:
           name: thm-bot-logs
-          path: tryhackmebot.log
+          path: |
+            tryhackmebot.log
+            geckodriver.log
           retention-days: 7
