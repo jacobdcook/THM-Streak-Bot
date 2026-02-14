@@ -57,7 +57,7 @@ jobs:
 
       - name: Run THM Bot with timeout
         run: |
-          timeout 5m python main.py
+          timeout 12m python main.py
         env:
           DISPLAY: :99
         continue-on-error: true
