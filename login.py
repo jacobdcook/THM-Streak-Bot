@@ -128,14 +128,15 @@ def login_form(driver):
             print(f"[+] Page title: {driver.title}")
             f.write(f"[+] Page title: {driver.title}\n")
         
-        # Enhanced error handling for finding elements with multiple selectors
-        # Try different selectors for email field
+        # Try different selectors for email/username field (TryHackMe login-form.tsx)
         email_selectors = [
-            (By.ID, "email"),
-            (By.NAME, "email"),
+            (By.ID, "username-or-email-field"),
+            (By.NAME, "usernameOrEmail"),
+            (By.XPATH, "//input[@placeholder='example@example.com']"),
+            (By.NAME, "username"),
+            (By.ID, "username"),
             (By.XPATH, "//input[@type='email']"),
             (By.XPATH, "//input[contains(@placeholder, 'email')]"),
-            (By.XPATH, "//input[contains(@class, 'form-control')]")
         ]
         
         email_field = None
@@ -158,12 +159,13 @@ def login_form(driver):
         email_field.send_keys(config["account"]["mail"])
         time.sleep(random.uniform(1,2))
         
-        # Try different selectors for password field
+        # Try different selectors for password field (TryHackMe password-input.tsx)
         password_selectors = [
-            (By.ID, "password"),
+            (By.ID, "password-field"),
             (By.NAME, "password"),
+            (By.XPATH, "//input[@placeholder='Password']"),
+            (By.ID, "password"),
             (By.XPATH, "//input[@type='password']"),
-            (By.XPATH, "//input[contains(@placeholder, 'password')]")
         ]
         
         password_field = None
@@ -190,8 +192,10 @@ def login_form(driver):
         
         time.sleep(random.uniform(1,2))
         
-        # Try different selectors for login button
+        # Try different selectors for login button (TryHackMe uses "Log in")
         button_selectors = [
+            (By.XPATH, "//button[contains(text(), 'Log in')]"),
+            (By.XPATH, "//button[contains(text(), 'Log In')]"),
             (By.XPATH, "//button[contains(text(), 'Sign In')]"),
             (By.XPATH, "//button[contains(text(), 'Login')]"),
             (By.XPATH, "//button[@type='submit']"),
